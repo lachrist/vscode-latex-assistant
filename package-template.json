@@ -7,7 +7,7 @@
   "publisher": "lachrist",
   "repository": "https://github.com/lachrist/vscode-latex-assistant",
   "engines": {
-    "vscode": "^1.93.1"
+    "vscode": "^1.105.0"
   },
   "activationEvents": ["onStartupFinished"],
   "main": "./<LIB-DIR>/index.js",
@@ -84,8 +84,8 @@
     "prod": "node package-compile.mjs prod",
     "test": "node package-compile.mjs test && echo 'press F5'",
     "check": "npm run check-type && npm run check-format",
-    "pack": "node bundle.mjs && npx vsce package",
-    "publish": "node bundle.mjs && npx vsce publish"
+    "pack": "npm run prod && node bundle.mjs && npx vsce package",
+    "publish": "npm run prod && node bundle.mjs && npx vsce publish"
   },
   "files": ["out/index.js", "package.json", "seagull.png", "LICENSE"],
   "devDependencies": {
