@@ -87,15 +87,14 @@
   },
   "files": ["out/index.js", "package.json", "seagull.png", "LICENSE"],
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@types/vscode": "^1.73.0",
-    "@vscode/vsce": "^3.1.0",
-    "esbuild": "^0.23.1",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.2"
+    "@types/node": "^24.9.2",
+    "@types/vscode": "^1.105.0",
+    "@vscode/vsce": "^3.6.2",
+    "esbuild": "^0.25.11",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "html-to-latex-listing": "^0.3.2",
-    "minimatch": "^10.0.1"
+    "html-to-latex-listing": "^0.3.2"
   }
 }
