@@ -10,28 +10,37 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
+  if ((from && typeof from === "object") || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+        __defProp(to, key, {
+          get: () => from[key],
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+        });
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __toESM = (mod, isNodeMode, target) => (
+  (target = mod != null ? __create(__getProtoOf(mod)) : {}),
+  __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule
+      ? __defProp(target, "default", { value: mod, enumerable: true })
+      : target,
+    mod,
+  )
+);
+var __toCommonJS = (mod) =>
+  __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.mjs
 var src_exports = {};
 __export(src_exports, {
   activate: () => activate,
-  deactivate: () => deactivate
+  deactivate: () => deactivate,
 });
 module.exports = __toCommonJS(src_exports);
 var import_vscode = __toESM(require("vscode"), 1);
@@ -41,13 +50,12 @@ var import_node_process = require("node:process");
 
 // src/util.mjs
 var isNotNull = (value) => value !== null;
-var hasOwn = (
+var hasOwn =
   /** @type {any} */
-  Object.hasOwn
-);
+  Object.hasOwn;
 var isArray = Array.isArray;
 var toNullableStringEntry = (key) => [key, null];
-var get = (obj, key) => Object.hasOwn(obj, key) ? obj[key] ?? null : null;
+var get = (obj, key) => (Object.hasOwn(obj, key) ? (obj[key] ?? null) : null);
 var compileGet = (key) => (obj) => obj[key];
 var printError = (error) => {
   try {
@@ -97,7 +105,7 @@ var extractResponse = (data) => {
     const { message } = error;
     if (typeof message !== "string") {
       throw new TypeError("Openai error message is not a string", {
-        cause: data
+        cause: data,
       });
     }
     throw new OpenaiError(message);
@@ -108,7 +116,7 @@ var extractResponse = (data) => {
     const { choices } = data;
     if (!isArray(choices)) {
       throw new TypeError("Openai response choices is not an array", {
-        cause: data
+        cause: data,
       });
     }
     if (choices.length === 0) {
@@ -116,7 +124,7 @@ var extractResponse = (data) => {
     }
     if (choices.length > 1) {
       throw new TypeError("Openai response has multiple choices", {
-        cause: data
+        cause: data,
       });
     }
     const choice = choices[0];
@@ -125,13 +133,13 @@ var extractResponse = (data) => {
     }
     if (!hasOwn(choice, "finish_reason")) {
       throw new TypeError("OpenAI choice has no finish_reason", {
-        cause: data
+        cause: data,
       });
     }
     const { finish_reason } = choice;
     if (finish_reason !== "stop") {
       throw new Error("OpenAI did not finish", {
-        cause: data
+        cause: data,
       });
     }
     if (!hasOwn(choice, "message")) {
@@ -147,7 +155,7 @@ var extractResponse = (data) => {
     const { content } = message;
     if (typeof content !== "string") {
       throw new TypeError("OpenAI message content is not a string", {
-        cause: data
+        cause: data,
       });
     }
     return content;
@@ -163,16 +171,16 @@ var fetchOpenai = async (message, config) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${bearer}`
+      "Authorization": `Bearer ${bearer}`,
     },
     body: JSON.stringify({
       model: config.model,
       temperature: config.temperature,
       messages: [
         { role: "system", content: config["system-message"].join("\n") },
-        { role: "user", content: message }
-      ]
-    })
+        { role: "user", content: message },
+      ],
+    }),
   });
   return extractResponse(await response.json());
 };
@@ -181,7 +189,7 @@ var fetchOpenai = async (message, config) => {
 var COMMAND_REGEXP = /^\s*\\([a-zA-Z0-9_]+){/;
 var DIRECTION = {
   forward: 1,
-  backward: -1
+  backward: -1,
 };
 var parseCommand = (line) => {
   const parts = COMMAND_REGEXP.exec(line);
@@ -213,7 +221,11 @@ var excerptSection = (lines, start_line_index, { section_hierarchy }) => {
   }
   return Array.from(sections.values()).filter(isNotNull);
 };
-var excerptContext = (lines, index, { direction, isSection, max_char_count }) => {
+var excerptContext = (
+  lines,
+  index,
+  { direction, isSection, max_char_count },
+) => {
   const increment = DIRECTION[direction];
   const context = [];
   let char_count = 0;
@@ -231,16 +243,20 @@ var excerptContext = (lines, index, { direction, isSection, max_char_count }) =>
   }
   return context;
 };
-var excerpt = (content, { start: { line: start_line_index }, end: { line: end_line_index } }, {
-  line_separator,
-  config: {
-    "section-hierarchy": section_hierarchy,
-    "begin-selection-marker": begin_marker,
-    "end-selection-marker": end_marker,
-    "before-char-count": before_char_count,
-    "after-char-count": after_char_count
-  }
-}) => {
+var excerpt = (
+  content,
+  { start: { line: start_line_index }, end: { line: end_line_index } },
+  {
+    line_separator,
+    config: {
+      "section-hierarchy": section_hierarchy,
+      "begin-selection-marker": begin_marker,
+      "end-selection-marker": end_marker,
+      "before-char-count": before_char_count,
+      "after-char-count": after_char_count,
+    },
+  },
+) => {
   const lines = content.split(line_separator);
   const isSection = compileIsSection(section_hierarchy);
   return [
@@ -249,7 +265,7 @@ var excerpt = (content, { start: { line: start_line_index }, end: { line: end_li
     ...excerptContext(lines, start_line_index - 1, {
       direction: "backward",
       isSection,
-      max_char_count: before_char_count
+      max_char_count: before_char_count,
     }),
     begin_marker,
     ...lines.slice(start_line_index, end_line_index + 1),
@@ -257,16 +273,16 @@ var excerpt = (content, { start: { line: start_line_index }, end: { line: end_li
     ...excerptContext(lines, end_line_index + 1, {
       direction: "forward",
       isSection,
-      max_char_count: after_char_count
+      max_char_count: after_char_count,
     }),
-    "..."
+    "...",
   ].join("\n");
 };
 
 // src/index.mjs
 var LINE_SEPARATOR = {
   [import_vscode.default.EndOfLine.LF]: "\n",
-  [import_vscode.default.EndOfLine.CRLF]: "\r\n"
+  [import_vscode.default.EndOfLine.CRLF]: "\r\n",
 };
 var getName = compileGet("name");
 var activate = (context) => {
@@ -274,24 +290,28 @@ var activate = (context) => {
     import_vscode.default.commands.registerTextEditorCommand(
       "latex-assistant.prompt",
       async (editor, _edit, input) => {
-        const config = (
+        const config =
           /** @type {any} */
-          import_vscode.default.workspace.getConfiguration("latex-assistant")
-        );
+          import_vscode.default.workspace.getConfiguration("latex-assistant");
         try {
           await execute(editor, input, config);
         } catch (error) {
           import_vscode.default.window.showErrorMessage(printError(error));
         }
-      }
-    )
+      },
+    ),
   );
 };
 var DELIMITER = "%%%%%%%%%%";
 var execute = async (editor, input, config) => {
-  const name = input ?? await import_vscode.default.window.showQuickPick(config.openai.map(getName), {
-    placeHolder: "Choose a prompt"
-  });
+  const name =
+    input ??
+    (await import_vscode.default.window.showQuickPick(
+      config.openai.map(getName),
+      {
+        placeHolder: "Choose a prompt",
+      },
+    ));
   if (name != null) {
     const prompt = config.openai.find((prompt2) => prompt2.name === name);
     if (prompt == null) {
@@ -301,21 +321,21 @@ var execute = async (editor, input, config) => {
     const line_separator = LINE_SEPARATOR[editor.document.eol];
     const message = excerpt(editor.document.getText(), selection, {
       line_separator,
-      config: prompt
+      config: prompt,
     });
     const result = await fetchOpenai(message, prompt);
     editor.edit((edit) => {
       edit.insert(
         new import_vscode.default.Position(selection.end.line + 1, 0),
-        [DELIMITER, result, DELIMITER, ""].join(line_separator)
+        [DELIMITER, result, DELIMITER, ""].join(line_separator),
       );
     });
   }
 };
-var deactivate = () => {
-};
+var deactivate = () => {};
 // Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  activate,
-  deactivate
-});
+0 &&
+  (module.exports = {
+    activate,
+    deactivate,
+  });
