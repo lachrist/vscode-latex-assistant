@@ -21,7 +21,8 @@ const LIB_DIR = {
  *   content: string,
  * ) => string}
  */
-const formatJson = (content) => JSON.stringify(JSON.parse(content), null, 2);
+const formatJson = (content) =>
+  JSON.stringify(JSON.parse(content), null, 2) + "\n";
 
 /**
  * @type {(

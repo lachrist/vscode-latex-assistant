@@ -1,5 +1,87 @@
 import { env } from "node:process";
-import { get } from "./util.mjs";
+import { get, hasOwn, isArray } from "./util.mjs";
+
+class OpenaiError extends Error {
+  constructor(/** @type {string} */ message) {
+    super(message);
+    this.name = "OpenaiError";
+  }
+}
+
+/**
+ * @type {(data: unknown) => string}
+ */
+export const extractResponse = (data) => {
+  if (typeof data !== "object" || data === null) {
+    throw new TypeError("Openai response was not an object", { cause: data });
+  }
+  if (hasOwn(data, "error")) {
+    const { error } = data;
+    if (typeof error !== "object" || error === null) {
+      throw new TypeError("Openai error was not an object", { cause: data });
+    }
+    if (!hasOwn(error, "message")) {
+      throw new TypeError("Openai error has no message", { cause: data });
+    }
+    const { message } = error;
+    if (typeof message !== "string") {
+      throw new TypeError("Openai error message is not a string", {
+        cause: data,
+      });
+    }
+    throw new OpenaiError(message);
+  } else {
+    if (!hasOwn(data, "choices")) {
+      throw new TypeError("Openai response has no choices", { cause: data });
+    }
+    const { choices } = data;
+    if (!isArray(choices)) {
+      throw new TypeError("Openai response choices is not an array", {
+        cause: data,
+      });
+    }
+    if (choices.length === 0) {
+      throw new TypeError("Openai response has no choices", { cause: data });
+    }
+    if (choices.length > 1) {
+      throw new TypeError("Openai response has multiple choices", {
+        cause: data,
+      });
+    }
+    const choice = choices[0];
+    if (typeof choice !== "object" || choice === null) {
+      throw new TypeError("OpenAI choice is not an object", { cause: data });
+    }
+    if (!hasOwn(choice, "finish_reason")) {
+      throw new TypeError("OpenAI choice has no finish_reason", {
+        cause: data,
+      });
+    }
+    const { finish_reason } = choice;
+    if (finish_reason !== "stop") {
+      throw new Error("OpenAI did not finish", {
+        cause: data,
+      });
+    }
+    if (!hasOwn(choice, "message")) {
+      throw new TypeError("OpenAI choice has no message", { cause: data });
+    }
+    const { message } = choice;
+    if (typeof message !== "object" || message === null) {
+      throw new TypeError("OpenAI message is not an object", { cause: data });
+    }
+    if (!hasOwn(message, "content")) {
+      throw new TypeError("OpenAI message has no content", { cause: data });
+    }
+    const { content } = message;
+    if (typeof content !== "string") {
+      throw new TypeError("OpenAI message content is not a string", {
+        cause: data,
+      });
+    }
+    return content;
+  }
+};
 
 /**
  * @type {(
@@ -28,15 +110,5 @@ export const fetchOpenai = async (message, config) => {
       ],
     }),
   });
-  const data = /** @type {import("./openai").OpenaiResponse} */ (
-    await response.json()
-  );
-  if (data.choices.length === 0) {
-    throw new Error("OpenAI did not return any choices");
-  }
-  const choice = data.choices[0];
-  if (choice.finish_reason !== "stop") {
-    throw new Error(`OpenAI did not finish: ${choice.finish_reason}`);
-  }
-  return data.choices[0].message.content;
+  return extractResponse(await response.json());
 };

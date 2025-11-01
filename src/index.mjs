@@ -1,6 +1,6 @@
 import vscode from "../ext/vscode.mjs";
 import { fetchOpenai } from "./openai.mjs";
-import { compileGet, getErrorMessage } from "./util.mjs";
+import { compileGet, printError } from "./util.mjs";
 import { excerpt } from "./excerpt.mjs";
 
 const LINE_SEPARATOR = {
@@ -27,7 +27,7 @@ export const activate = (context) => {
         try {
           await execute(editor, input, config);
         } catch (error) {
-          vscode.window.showErrorMessage(getErrorMessage(error));
+          vscode.window.showErrorMessage(printError(error));
         }
       },
     ),
