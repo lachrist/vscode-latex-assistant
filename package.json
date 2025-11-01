@@ -3,7 +3,7 @@
   "icon": "seagull.png",
   "displayName": "LaTeX Assistant",
   "description": "LaTeX assistant writer powered by AI.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "publisher": "lachrist",
   "repository": "https://github.com/lachrist/vscode-latex-assistant",
   "engines": {
@@ -194,9 +194,11 @@
   "scripts": {
     "check-type": "npx tsc",
     "check-format": "npx prettier --check .",
+    "prod": "node package-compile.mjs prod",
+    "test": "node package-compile.mjs test && echo 'press F5'",
     "check": "npm run check-type && npm run check-format",
-    "pack": "node package-compile.mjs prod && node bundle.mjs && npx vsce package",
-    "publish": "node package-compile.mjs prod && node bundle.mjs && npx vsce publish"
+    "pack": "node bundle.mjs && npx vsce package",
+    "publish": "node bundle.mjs && npx vsce publish"
   },
   "files": [
     "out/index.js",
