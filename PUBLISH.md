@@ -1,0 +1,6 @@
+- https://dev.azure.com/lachrist
+- laurent.christophe.terken@gmail.com
+- Top right: Personal Access Tokens
+- New Token
+- Marketplace Publish
+- npx vsce login lachrist
